@@ -157,9 +157,7 @@ export function matchesAnyFact(literal: string, facts: FactTable): boolean {
   const decimals = literal.replace(/[,%]/g, "").split(".")[1]?.length ?? 0;
 
   for (const value of facts.values()) {
-    const candidates = isPercent
-      ? [value * 100, value]
-      : [value, value / 24, value * 24, value * 100];
+    const candidates = isPercent ? [value * 100, value] : [value, value / 24, value * 24, value * 100];
     for (const c of candidates) {
       if (roundsTo(Math.abs(c), Math.abs(n), decimals)) return true;
     }

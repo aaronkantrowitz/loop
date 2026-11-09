@@ -76,9 +76,7 @@ export class Store {
         INSERT INTO reviews (id, repo_id, pr_number, author, author_is_bot, state, submitted_at, comment_count)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (id) DO NOTHING`),
-      prsSince: db.prepare(
-        "SELECT * FROM pull_requests WHERE repo_id = ? AND updated_at >= ? ORDER BY number",
-      ),
+      prsSince: db.prepare("SELECT * FROM pull_requests WHERE repo_id = ? AND updated_at >= ? ORDER BY number"),
       reviewsSince: db.prepare(`
         SELECT r.* FROM reviews r
         JOIN pull_requests p ON p.repo_id = r.repo_id AND p.number = r.pr_number

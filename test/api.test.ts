@@ -12,17 +12,61 @@ import { testConfig } from "./helpers.js";
 const NOW = new Date("2026-11-09T12:00:00Z");
 
 const prs = [
-  pr({ number: 1, author: "alice", createdAt: "2026-10-20T00:00:00.000Z", mergedAt: "2026-10-21T00:00:00.000Z", updatedAt: "2026-10-21T00:00:00.000Z", additions: 100, deletions: 20, reviews: [review({ author: "bob", submittedAt: "2026-10-20T04:00:00.000Z", commentCount: 3 })] }),
-  pr({ number: 2, author: "alice", createdAt: "2026-10-25T00:00:00.000Z", mergedAt: "2026-10-27T00:00:00.000Z", updatedAt: "2026-10-27T00:00:00.000Z", reviews: [review({ author: "bob", submittedAt: "2026-10-26T00:00:00.000Z" })] }),
-  pr({ number: 3, author: "carol", createdAt: "2026-11-01T00:00:00.000Z", mergedAt: "2026-11-02T00:00:00.000Z", updatedAt: "2026-11-02T00:00:00.000Z", reviews: [] }),
-  pr({ number: 4, author: "bob", state: "OPEN", createdAt: "2026-11-03T00:00:00.000Z", mergedAt: null, closedAt: null, updatedAt: "2026-11-04T00:00:00.000Z", reviews: [review({ author: "alice", state: "CHANGES_REQUESTED", submittedAt: "2026-11-04T00:00:00.000Z" })] }),
-  pr({ number: 5, author: "dave", createdAt: "2026-09-30T00:00:00.000Z", mergedAt: "2026-10-01T00:00:00.000Z", updatedAt: "2026-10-01T00:00:00.000Z" }),
+  pr({
+    number: 1,
+    author: "alice",
+    createdAt: "2026-10-20T00:00:00.000Z",
+    mergedAt: "2026-10-21T00:00:00.000Z",
+    updatedAt: "2026-10-21T00:00:00.000Z",
+    additions: 100,
+    deletions: 20,
+    reviews: [review({ author: "bob", submittedAt: "2026-10-20T04:00:00.000Z", commentCount: 3 })],
+  }),
+  pr({
+    number: 2,
+    author: "alice",
+    createdAt: "2026-10-25T00:00:00.000Z",
+    mergedAt: "2026-10-27T00:00:00.000Z",
+    updatedAt: "2026-10-27T00:00:00.000Z",
+    reviews: [review({ author: "bob", submittedAt: "2026-10-26T00:00:00.000Z" })],
+  }),
+  pr({
+    number: 3,
+    author: "carol",
+    createdAt: "2026-11-01T00:00:00.000Z",
+    mergedAt: "2026-11-02T00:00:00.000Z",
+    updatedAt: "2026-11-02T00:00:00.000Z",
+    reviews: [],
+  }),
+  pr({
+    number: 4,
+    author: "bob",
+    state: "OPEN",
+    createdAt: "2026-11-03T00:00:00.000Z",
+    mergedAt: null,
+    closedAt: null,
+    updatedAt: "2026-11-04T00:00:00.000Z",
+    reviews: [review({ author: "alice", state: "CHANGES_REQUESTED", submittedAt: "2026-11-04T00:00:00.000Z" })],
+  }),
+  pr({
+    number: 5,
+    author: "dave",
+    createdAt: "2026-09-30T00:00:00.000Z",
+    mergedAt: "2026-10-01T00:00:00.000Z",
+    updatedAt: "2026-10-01T00:00:00.000Z",
+  }),
 ];
 
 const narrativeOutput: ModelNarrative = {
   headline: "Three PRs merged, one without review",
   summary: "3 PRs merged and 1 merged without review.",
-  observations: [{ title: "Review coverage", detail: "One merge skipped review.", evidence: [{ factId: "current.flow.prsMergedWithoutReview", interpretation: "gap" }] }],
+  observations: [
+    {
+      title: "Review coverage",
+      detail: "One merge skipped review.",
+      evidence: [{ factId: "current.flow.prsMergedWithoutReview", interpretation: "gap" }],
+    },
+  ],
   hypothesis: null,
   caveats: ["Small sample"],
 };
@@ -38,7 +82,9 @@ class FakeModel implements NarrativeModel {
 
 let app: FastifyInstance;
 
-async function start(opts: { github?: GitHubSource; model?: NarrativeModel | null; env?: Record<string, string> } = {}) {
+async function start(
+  opts: { github?: GitHubSource; model?: NarrativeModel | null; env?: Record<string, string> } = {},
+) {
   vi.useFakeTimers({ now: NOW, toFake: ["Date"] });
   app = await buildApp({
     config: testConfig(opts.env),
@@ -60,20 +106,44 @@ describe("GET /api/v1/repos/:owner/:repo/insights", () => {
     const res = await app.inject("/api/v1/repos/acme/widgets/insights?from=2026-10-15&to=2026-11-08");
     expect(res.statusCode).toBe(200);
     const body = res.json();
-    expect(body.repository).toEqual({ owner: "Acme", name: "Widgets", defaultBranch: "main", url: "https://github.com/Acme/Widgets" });
+    expect(body.repository).toEqual({
+      owner: "Acme",
+      name: "Widgets",
+      defaultBranch: "main",
+      url: "https://github.com/Acme/Widgets",
+    });
     expect(body.period).toEqual({ from: "2026-10-15T00:00:00.000Z", to: "2026-11-09T00:00:00.000Z" });
-    expect(body.current.flow).toMatchObject({ prsOpened: 4, prsMerged: 3, prsMergedWithoutReview: 1, medianHoursToFirstReview: 4 });
-    expect(body.current.contributors[0]).toMatchObject({ login: "alice", prsMerged: 2, linesAdded: 110, linesDeleted: 25 });
+    expect(body.current.flow).toMatchObject({
+      prsOpened: 4,
+      prsMerged: 3,
+      prsMergedWithoutReview: 1,
+      medianHoursToFirstReview: 4,
+    });
+    expect(body.current.contributors[0]).toMatchObject({
+      login: "alice",
+      prsMerged: 2,
+      linesAdded: 110,
+      linesDeleted: 25,
+    });
     expect(body.current.reviewers.map((r: { login: string }) => r.login)).toEqual(["bob", "alice"]);
     expect(body.previous.flow.prsMerged).toBe(1);
-    expect(body.changes.find((c: { metric: string }) => c.metric === "flow.prsMerged")).toEqual({ metric: "flow.prsMerged", current: 3, previous: 1, delta: 2, deltaRatio: 2 });
+    expect(body.changes.find((c: { metric: string }) => c.metric === "flow.prsMerged")).toEqual({
+      metric: "flow.prsMerged",
+      current: 3,
+      previous: 1,
+      delta: 2,
+      deltaRatio: 2,
+    });
     expect(res.headers.etag).toBeDefined();
   });
 
   it("answers a conditional request with 304", async () => {
     await start();
     const first = await app.inject("/api/v1/repos/acme/widgets/insights?from=2026-10-15&to=2026-11-08");
-    const second = await app.inject({ url: "/api/v1/repos/acme/widgets/insights?from=2026-10-15&to=2026-11-08", headers: { "if-none-match": first.headers.etag as string } });
+    const second = await app.inject({
+      url: "/api/v1/repos/acme/widgets/insights?from=2026-10-15&to=2026-11-08",
+      headers: { "if-none-match": first.headers.etag as string },
+    });
     expect(second.statusCode).toBe(304);
   });
 
@@ -93,7 +163,11 @@ describe("GET /api/v1/repos/:owner/:repo/insights", () => {
 
   it("maps a missing upstream repository to 404", async () => {
     await start({
-      github: { fetchPullRequestPage: async () => { throw new NotFoundError("Repository acme/nope was not found or is not accessible"); } },
+      github: {
+        fetchPullRequestPage: async () => {
+          throw new NotFoundError("Repository acme/nope was not found or is not accessible");
+        },
+      },
     });
     const res = await app.inject("/api/v1/repos/acme/nope/insights");
     expect(res.statusCode).toBe(404);
@@ -106,7 +180,13 @@ describe("GET /api/v1/repos/:owner/:repo/insights", () => {
   });
 
   it("hides internal error details", async () => {
-    await start({ github: { fetchPullRequestPage: async () => { throw new Error("secret internals"); } } });
+    await start({
+      github: {
+        fetchPullRequestPage: async () => {
+          throw new Error("secret internals");
+        },
+      },
+    });
     const res = await app.inject("/api/v1/repos/acme/widgets/insights");
     expect(res.statusCode).toBe(500);
     expect(res.body).not.toContain("secret internals");
@@ -121,7 +201,9 @@ describe("GET /api/v1/repos/:owner/:repo/insights/narrative", () => {
     const res = await app.inject(url);
     expect(res.statusCode).toBe(200);
     const body = res.json();
-    expect(body.narrative.observations[0].evidence).toEqual([{ factId: "current.flow.prsMergedWithoutReview", value: 1, interpretation: "gap" }]);
+    expect(body.narrative.observations[0].evidence).toEqual([
+      { factId: "current.flow.prsMergedWithoutReview", value: 1, interpretation: "gap" },
+    ]);
     expect(body.narrative.verification).toMatchObject({ grounded: true, unknownFactIds: [] });
     expect(body.generation).toMatchObject({ model: "fake-model", cached: false });
 

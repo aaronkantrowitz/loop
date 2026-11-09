@@ -5,4 +5,10 @@ import { loadConfig } from "../src/config.js";
 export const silentLogger = Fastify({ logger: false }).log;
 
 export const testConfig = (overrides: Record<string, string> = {}) =>
-  loadConfig({ NODE_ENV: "test", LOG_LEVEL: "silent", GITHUB_TOKEN: "test-token", DATABASE_PATH: ":memory:", ...overrides });
+  loadConfig({
+    NODE_ENV: "test",
+    LOG_LEVEL: "silent",
+    GITHUB_TOKEN: "test-token",
+    DATABASE_PATH: ":memory:",
+    ...overrides,
+  });

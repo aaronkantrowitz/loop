@@ -1,1 +1,57 @@
-<!doctype html><title>Repo Pulse</title>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Repo Pulse</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Repo Pulse</h1>
+      <p class="muted">Who ships, who reviews, and where work waits in a public GitHub repository.</p>
+    </header>
+
+    <form id="query">
+      <label>Repository <input name="repo" value="fastify/fastify" required pattern="[A-Za-z0-9\-]+/[A-Za-z0-9._\-]+" /></label>
+      <label>From <input name="from" type="date" /></label>
+      <label>To <input name="to" type="date" /></label>
+      <label class="check"><input name="includeBots" type="checkbox" /> Include bots</label>
+      <button type="submit">Load insights</button>
+    </form>
+
+    <p id="status" class="muted" role="status"></p>
+
+    <main id="report" hidden>
+      <section class="cards" id="cards"></section>
+
+      <section id="narrative-section">
+        <div class="section-head">
+          <h2>What stands out</h2>
+          <button id="explain" type="button">Explain with AI</button>
+        </div>
+        <div id="narrative"><p class="muted">Ask the model to read these numbers. Every claim links back to a metric below.</p></div>
+      </section>
+
+      <div class="grid">
+        <section>
+          <h2>Top contributors</h2>
+          <table id="contributors"></table>
+        </section>
+        <section>
+          <h2>Top reviewers</h2>
+          <table id="reviewers"></table>
+        </section>
+      </div>
+
+      <section>
+        <h2>Who reviews whom</h2>
+        <table id="pairs"></table>
+      </section>
+
+      <p id="meta" class="muted small"></p>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

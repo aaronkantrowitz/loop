@@ -17,8 +17,10 @@ describe("resolvePeriod", () => {
     expect(p.to.toISOString()).toBe("2026-11-01T00:00:00.000Z");
   });
 
-  it("clamps `to` to now", () => {
-    expect(resolvePeriod({ from: "2026-11-01", to: "2027-01-01" }, 180, now).to).toEqual(now);
+  it("clamps `to` to the start of the current hour", () => {
+    const later = new Date("2026-11-09T12:34:56Z");
+    expect(resolvePeriod({ from: "2026-11-01", to: "2027-01-01" }, 180, later).to).toEqual(now);
+    expect(resolvePeriod({}, 180, later).to).toEqual(now);
   });
 
   it.each([

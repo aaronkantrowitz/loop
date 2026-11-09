@@ -1,7 +1,7 @@
 import type { FastifyBaseLogger } from "fastify";
+import type { RepositoryRecord, Store } from "../db/store.js";
 import type { RepoRef } from "../domain.js";
 import { repoSlug } from "../domain.js";
-import type { RepositoryRecord, Store } from "../db/store.js";
 import type { GitHubSource } from "../github/client.js";
 
 /** Overlap re-fetched on incremental syncs to tolerate clock skew and GitHub's eventual consistency. */
@@ -114,12 +114,16 @@ export class SyncService {
     const syncedAt = startedAt.toISOString();
     this.store.markSynced(repo.id, canonical, canonical.defaultBranch, coverageFrom, syncedAt);
 
-    this.log.info(
-      { repo: repoSlug(ref), pages, coverageFrom, complete: reachedStop },
-      "repository synced from GitHub",
-    );
+    this.log.info({ repo: repoSlug(ref), pages, coverageFrom, complete: reachedStop }, "repository synced from GitHub");
     return {
-      repository: { ...repo, owner: canonical.owner, name: canonical.name, defaultBranch: canonical.defaultBranch, coverageFrom, syncedAt },
+      repository: {
+        ...repo,
+        owner: canonical.owner,
+        name: canonical.name,
+        defaultBranch: canonical.defaultBranch,
+        coverageFrom,
+        syncedAt,
+      },
       coverageFrom,
       syncedAt,
       complete: reachedStop,

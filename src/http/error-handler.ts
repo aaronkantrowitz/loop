@@ -30,7 +30,10 @@ export function registerErrorHandler(app: FastifyInstance): void {
       const level = error.statusCode >= 500 ? "warn" : "info";
       request.log[level]({ err: error }, error.message);
       if (error.retryAfterSeconds) reply.header("retry-after", String(error.retryAfterSeconds));
-      return reply.status(error.statusCode).type("application/problem+json").send(problem(error.statusCode, error.code, error.message));
+      return reply
+        .status(error.statusCode)
+        .type("application/problem+json")
+        .send(problem(error.statusCode, error.code, error.message));
     }
 
     // Fastify's own client errors (rate limit, malformed JSON, payload too large).
@@ -42,11 +45,17 @@ export function registerErrorHandler(app: FastifyInstance): void {
     }
 
     request.log.error({ err: error }, "unhandled error");
-    return reply.status(500).type("application/problem+json").send(problem(500, "internal_error", "Something went wrong"));
+    return reply
+      .status(500)
+      .type("application/problem+json")
+      .send(problem(500, "internal_error", "Something went wrong"));
   });
 
   app.setNotFoundHandler((request, reply) => {
-    reply.status(404).type("application/problem+json").send(problem(404, "not_found", `No route for ${request.method} ${request.url.split("?")[0]}`));
+    reply
+      .status(404)
+      .type("application/problem+json")
+      .send(problem(404, "not_found", `No route for ${request.method} ${request.url.split("?")[0]}`));
   });
 }
 

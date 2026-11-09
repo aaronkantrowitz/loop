@@ -11,7 +11,12 @@ function setup(prs = defaultPrs(), opts: { maxPages?: number; now?: Date } = {})
   const store = new Store(openDatabase(":memory:"));
   const github = new FakeGitHub(prs, 2);
   let now = opts.now ?? new Date("2026-11-01T00:00:00Z");
-  const sync = new SyncService(store, github, { ttlMs: 15 * 60_000, maxPages: opts.maxPages ?? 10, now: () => now }, silentLogger);
+  const sync = new SyncService(
+    store,
+    github,
+    { ttlMs: 15 * 60_000, maxPages: opts.maxPages ?? 10, now: () => now },
+    silentLogger,
+  );
   return { store, github, sync, advance: (ms: number) => (now = new Date(now.getTime() + ms)) };
 }
 
@@ -30,7 +35,9 @@ describe("SyncService", () => {
 
     await sync.ensureCoverage(repo, new Date("2026-10-20T00:00:00Z"));
     expect(github.calls).toBe(2);
-    expect(store.pullRequestsUpdatedSince(result.repository.id, "2026-10-18T00:00:00.000Z").map((p) => p.number)).toEqual([4, 5, 6]);
+    expect(
+      store.pullRequestsUpdatedSince(result.repository.id, "2026-10-18T00:00:00.000Z").map((p) => p.number),
+    ).toEqual([4, 5, 6]);
   });
 
   it("refreshes incrementally once the data is stale", async () => {

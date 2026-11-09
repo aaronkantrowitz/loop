@@ -139,7 +139,8 @@ export class GitHubClient implements GitHubSource {
     const r = data.repository;
     // Only public data is in scope. Refuse private repos even if the token could read them,
     // so a broadly scoped token can't leak private activity through this public service.
-    if (r.isPrivate) throw new NotFoundError(`Repository ${repo.owner}/${repo.name} was not found or is not accessible`);
+    if (r.isPrivate)
+      throw new NotFoundError(`Repository ${repo.owner}/${repo.name} was not found or is not accessible`);
 
     return {
       repository: { owner: r.owner.login, name: r.name, defaultBranch: r.defaultBranchRef?.name ?? null },

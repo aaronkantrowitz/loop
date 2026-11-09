@@ -17,7 +17,11 @@ const RepoParams = z.object({
 });
 
 const PeriodQuery = z.object({
-  from: z.string().max(40).optional().describe("Start of the period, ISO-8601 date or timestamp. Defaults to 30 days before `to`."),
+  from: z
+    .string()
+    .max(40)
+    .optional()
+    .describe("Start of the period, ISO-8601 date or timestamp. Defaults to 30 days before `to`."),
   to: z.string().max(40).optional().describe("End of the period (a date is inclusive). Defaults to now."),
   includeBots: z
     .enum(["true", "false"])

@@ -71,7 +71,15 @@ describe("computeWindowMetrics", () => {
     );
     expect(m.flow.prsMerged).toBe(0);
     expect(m.reviewers).toEqual([
-      { login: "carol", reviews: 1, approvals: 0, changesRequested: 0, reviewComments: 4, prsReviewed: 1, authorsReviewed: 1 },
+      {
+        login: "carol",
+        reviews: 1,
+        approvals: 0,
+        changesRequested: 0,
+        reviewComments: 4,
+        prsReviewed: 1,
+        authorsReviewed: 1,
+      },
     ]);
     expect(m.reviewPairs).toEqual([{ reviewer: "carol", author: "alice", reviews: 1 }]);
   });
@@ -83,7 +91,12 @@ describe("computeWindowMetrics", () => {
     const m = computeWindowMetrics(prs, october, { ...opts, limit: 2 });
     expect(m.contributors).toHaveLength(2);
     expect(m.totals.reviews).toBe(8);
-    expect(m.concentration).toMatchObject({ activeAuthors: 4, activeReviewers: 5, topReviewerShareOfReviews: 0.5, reviewBusFactor: 1 });
+    expect(m.concentration).toMatchObject({
+      activeAuthors: 4,
+      activeReviewers: 5,
+      topReviewerShareOfReviews: 0.5,
+      reviewBusFactor: 1,
+    });
   });
 
   it("returns nulls rather than zeros for empty samples", () => {

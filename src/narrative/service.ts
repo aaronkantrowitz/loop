@@ -42,7 +42,16 @@ export class NarrativeService {
     const facts = buildFacts(report);
     // Same model, prompt and numbers produce the same key, so repeat requests cost nothing.
     const cacheKey = createHash("sha256")
-      .update(JSON.stringify({ model: model.id, PROMPT_VERSION, repo: report.repository, period: report.period, filters: report.filters, facts }))
+      .update(
+        JSON.stringify({
+          model: model.id,
+          PROMPT_VERSION,
+          repo: report.repository,
+          period: report.period,
+          filters: report.filters,
+          facts,
+        }),
+      )
       .digest("hex");
 
     const cached = this.store.getNarrative(cacheKey);
@@ -74,7 +83,12 @@ export class NarrativeService {
       repository: report.repository,
       period: report.period,
       narrative,
-      generation: { model: servedBy, promptVersion: PROMPT_VERSION, generatedAt: new Date().toISOString(), cached: false },
+      generation: {
+        model: servedBy,
+        promptVersion: PROMPT_VERSION,
+        generatedAt: new Date().toISOString(),
+        cached: false,
+      },
     };
     this.store.putNarrative(cacheKey, JSON.stringify(response));
     return response;

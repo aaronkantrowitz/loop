@@ -84,7 +84,11 @@ export const LARGE_PR_LINES = 500;
 const GHOST = "ghost";
 const HOUR_MS = 3_600_000;
 
-export function computeWindowMetrics(prs: readonly PullRequest[], period: Period, options: MetricOptions): WindowMetrics {
+export function computeWindowMetrics(
+  prs: readonly PullRequest[],
+  period: Period,
+  options: MetricOptions,
+): WindowMetrics {
   const fromIso = period.from.toISOString();
   const toIso = period.to.toISOString();
   const inWindow = (ts: string | null): ts is string => ts !== null && ts >= fromIso && ts < toIso;
@@ -105,7 +109,15 @@ export function computeWindowMetrics(prs: readonly PullRequest[], period: Period
   const contributor = (login: string) => {
     let c = contributors.get(login);
     if (!c) {
-      c = { login, prsOpened: 0, prsMerged: 0, linesAdded: 0, linesDeleted: 0, medianHoursToMerge: null, mergeHours: [] };
+      c = {
+        login,
+        prsOpened: 0,
+        prsMerged: 0,
+        linesAdded: 0,
+        linesDeleted: 0,
+        medianHoursToMerge: null,
+        mergeHours: [],
+      };
       contributors.set(login, c);
     }
     return c;
@@ -115,8 +127,7 @@ export function computeWindowMetrics(prs: readonly PullRequest[], period: Period
     const author = pr.author ?? GHOST;
     const prIsBot = pr.authorIsBot && !options.includeBots;
     const opened = inWindow(pr.createdAt);
-    const merged =
-      inWindow(pr.mergedAt) && (options.defaultBranch === null || pr.baseRef === options.defaultBranch);
+    const merged = inWindow(pr.mergedAt) && (options.defaultBranch === null || pr.baseRef === options.defaultBranch);
     const qualifyingReviews = pr.reviews.filter((r) => isQualifyingReview(r, pr, options.includeBots));
 
     // Reviews are credited to the reviewer even when the PR author is a bot: reviewing a
@@ -132,7 +143,17 @@ export function computeWindowMetrics(prs: readonly PullRequest[], period: Period
       const login = review.author ?? GHOST;
       let r = reviewers.get(login);
       if (!r) {
-        r = { login, reviews: 0, approvals: 0, changesRequested: 0, reviewComments: 0, prsReviewed: 0, authorsReviewed: 0, prs: new Set(), authors: new Set() };
+        r = {
+          login,
+          reviews: 0,
+          approvals: 0,
+          changesRequested: 0,
+          reviewComments: 0,
+          prsReviewed: 0,
+          authorsReviewed: 0,
+          prs: new Set(),
+          authors: new Set(),
+        };
         reviewers.set(login, r);
       }
       r.reviews++;

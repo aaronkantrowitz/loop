@@ -34,6 +34,8 @@ const base: ModelNarrative = {
   caveats: [],
 };
 
+const baseHypothesis = base.hypothesis as NonNullable<ModelNarrative["hypothesis"]>;
+
 describe("verifyNarrative", () => {
   it("attaches server-side values, drops unknown facts and scales confidence", () => {
     const v = verifyNarrative(base, { facts, mergedPrs: 48, dataComplete: true });
@@ -50,7 +52,11 @@ describe("verifyNarrative", () => {
 
   it("flags numbers that match no fact and caps confidence on small samples", () => {
     const v = verifyNarrative(
-      { ...base, summary: "Merges rose 340% this month.", hypothesis: { ...base.hypothesis!, evidence: base.hypothesis!.evidence.slice(0, 1) } },
+      {
+        ...base,
+        summary: "Merges rose 340% this month.",
+        hypothesis: { ...baseHypothesis, evidence: baseHypothesis.evidence.slice(0, 1) },
+      },
       { facts, mergedPrs: 8, dataComplete: true },
     );
     expect(v.verification.unverifiedNumbers).toEqual(["340%"]);
@@ -60,7 +66,11 @@ describe("verifyNarrative", () => {
 
   it("drops observations whose evidence is all invalid and keeps null hypotheses null", () => {
     const v = verifyNarrative(
-      { ...base, observations: [{ title: "x", detail: "y", evidence: [{ factId: "nope", interpretation: "" }] }], hypothesis: null },
+      {
+        ...base,
+        observations: [{ title: "x", detail: "y", evidence: [{ factId: "nope", interpretation: "" }] }],
+        hypothesis: null,
+      },
       { facts, mergedPrs: 48, dataComplete: true },
     );
     expect(v.observations).toEqual([]);
