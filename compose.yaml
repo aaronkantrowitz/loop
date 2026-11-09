@@ -1,0 +1,16 @@
+services:
+  repo-pulse:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN:?Set GITHUB_TOKEN in your shell or .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-5-5}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - repo-pulse-data:/data
+    restart: unless-stopped
+
+volumes:
+  repo-pulse-data:
