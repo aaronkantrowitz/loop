@@ -8,8 +8,9 @@ export class AppError extends Error {
     readonly code: string,
     message: string,
     readonly retryAfterSeconds?: number,
+    options?: ErrorOptions,
   ) {
-    super(message);
+    super(message, options);
     this.name = new.target.name;
   }
 }
@@ -34,8 +35,8 @@ export class BadRequestError extends AppError {
 
 /** The upstream API failed or returned something we could not use. */
 export class UpstreamError extends AppError {
-  constructor(message: string) {
-    super(502, "upstream_error", message);
+  constructor(message: string, options?: ErrorOptions) {
+    super(502, "upstream_error", message, undefined, options);
   }
 }
 
